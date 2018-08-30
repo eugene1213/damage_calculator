@@ -1,0 +1,5 @@
+.formWrap {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 36px;
+}

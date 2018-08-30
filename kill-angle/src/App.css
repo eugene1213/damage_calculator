@@ -1,3 +1,21 @@
+@import '~antd/dist/antd.css';
+
+#calc {
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 36px;
+}
+.ant-layout-header {
+  color: white;
+}
+.ant-layout-content {
+  min-height: calc(100vh - 64px - 69px);
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+.ant-table-wrapper {
+  margin-top: 36px;
+}
 .App {
   text-align: center;
 }

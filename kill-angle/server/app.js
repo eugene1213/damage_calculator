@@ -1,3 +1,4 @@
+//node api server
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
@@ -17,28 +18,6 @@ db.once('open', () => {
     console.log('DB Connected!');
 });
 
-var stats = 
-[{
-    ad: 0,
-    ap: 0,
-    hp: 0,
-    mp: 0,
-    adar: 0,
-    apar: 0,
-    speed: 0,
-    attackSpeed: 1
-},//attackChampion
-{
-    ad: 0,
-    ap: 0,
-    hp: 0,
-    mp: 0,
-    adar: 0,
-    apar: 0,
-    speed: 0,
-    attackSpeed: 1
-}]; //defenseChampion
-
     //  itemObj:{
         //  id,
         //  name,
@@ -56,17 +35,17 @@ var stats =
 var addStatsOfChampion = (statsObj, championStats, lv) => { // stats 배열에 챔피언 레벨에 맞는 성장치를 계산해서 넣는다.
     if(championStats != undefined){
         statsObj.ad = championStats.attackdamage;
-        statsObj.ad += championStats.attackdamageperlevel * lv;   
+        statsObj.ad += championStats.attackdamageperlevel * (lv-1);   
         statsObj.adar = championStats.armor;
-        statsObj.adar += championStats.armorperlevel * lv;
+        statsObj.adar += championStats.armorperlevel * (lv-1);
         statsObj.apar = championStats.spellblock;                
-        statsObj.apar += championStats.spellblockperlevel * lv; 
+        statsObj.apar += championStats.spellblockperlevel * (lv-1); 
         statsObj.hp = championStats.hp;
-        statsObj.hp += championStats.hpperlevel * lv;  
+        statsObj.hp += championStats.hpperlevel * (lv-1);  
         statsObj.mp = championStats.mp;
-        statsObj.mp += championStats.mpperlevel * lv;
+        statsObj.mp += championStats.mpperlevel * (lv-1);
         statsObj.attackSpeed = 0.625/(1 + championStats.attackspeedoffset);
-        statsObj.attackSpeed += statsObj.attackSpeed * (championStats.attackspeedperlevel * 0.01 * lv);
+        statsObj.attackSpeed += statsObj.attackSpeed * (championStats.attackspeedperlevel * 0.01 * (lv-1));
         statsObj.speed = championStats.movespeed;
     }
 }
@@ -83,9 +62,35 @@ var addStatsOfItems = (itemObj, statsObj) => {  // 아이템에 붙은 스탯을
         statsObj.attackSpeed += statsObj.attackSpeed * (itemObj.attackspeedoffset * 0.01);
     }
 }
-  
+app.use((req, res, next) => {
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
 app.get('/killangle',async (req, res) => {
-
+    var stats = 
+    [{
+        ad: 0,
+        ap: 0,
+        hp: 0,
+        mp: 0,
+        adar: 0,
+        apar: 0,
+        speed: 0,
+        attackSpeed: 1
+    },//attackChampion
+    {
+        ad: 0,
+        ap: 0,
+        hp: 0,
+        mp: 0,
+        adar: 0,
+        apar: 0,
+        speed: 0,
+        attackSpeed: 1
+    }]; //defenseChampion
+    
     let id1 = parseInt(req.query.id1),
         lv1 = parseInt(req.query.lv1),
         item1 = parseInt(req.query.item1),
@@ -147,10 +152,12 @@ app.get('/killangle',async (req, res) => {
     await Items.find( { "id": item12 } )
         .then(result => addStatsOfItems(result[0], stats[1]))
         .catch(err => console.log(err));
-    
-    return await res.json(stats);
+
+    return await res.json({
+        stats
+    });
  });
 
 app.listen(3001, () => {
-  console.log('Example app listening on port 3001!');
+  console.log('app listening on port 3001!');
 });
